@@ -1,0 +1,112 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.mavenPublish)
+    signing
+}
+
+kotlin {
+    jvm {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
+        }
+    }
+
+    applyDefaultHierarchyTemplate()
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                api(project(":omnical-icalendar"))
+                api(libs.bundles.datetime)
+                api(libs.bundles.biweekly)
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-sensitive-resolution")
+    }
+}
+
+dokka {
+    dokkaSourceSets {
+        configureEach {
+            sourceLink {
+                remoteUrl = uri("https://github.com/xfqwdsj/omnical/tree/v${version}/${project.name}")
+            }
+            documentedVisibilities(VisibilityModifier.Public, VisibilityModifier.Protected)
+        }
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+
+    pom {
+        name = project.name
+        description = "A Kotlin multiplatform library for calendar development."
+        url = "https://github.com/xfqwdsj/omnical"
+
+        licenses {
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/license/mit/"
+                distribution = "repo"
+            }
+        }
+
+        developers {
+            developer {
+                id = "xfqwdsj"
+                name = "LTFan"
+                email = "xfqwdsj@qq.com"
+                roles = listOf("Author", "Maintainer")
+            }
+        }
+
+        scm {
+            connection = "scm:git:https://github.com/xfqwdsj/omnical.git"
+            developerConnection = "scm:git:https://github.com/xfqwdsj/omnical.git"
+            url = "https://github.com/xfqwdsj/omnical"
+        }
+    }
+
+    configure(
+        KotlinMultiplatform(
+            javadocJar = JavadocJar.Dokka(tasks.dokkaGeneratePublicationHtml),
+        ),
+    )
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "gitHubPackages"
+            url = uri("https://maven.pkg.github.com/xfqwdsj/omnical")
+            credentials(PasswordCredentials::class)
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications)
+    val publishSigningMode = findProperty("publishSigningMode") as String?
+    if (publishSigningMode == "inMemory") return@signing
+    useGpgCmd()
+}
+
+group = "top.ltfan.omnical"

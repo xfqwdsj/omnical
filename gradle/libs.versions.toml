@@ -1,0 +1,34 @@
+# Version catalog is a central place for you to declare and version dependencies
+# https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
+# https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
+
+[versions]
+kotlin = "2.3.10"
+kotlinx-serialization = "1.10.0"
+kotlinx-datetime = "0.7.1"
+biweekly = "0.6.8"
+dokka = "2.1.0"
+mavenPublish = "0.36.0"
+
+[libraries]
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+biweekly = { module = "net.sf.biweekly:biweekly", version.ref = "biweekly" }
+
+# Libraries can be bundled together for easier import
+[bundles]
+serialization = [
+    "kotlinx-serialization-core"
+]
+datetime = [
+    "kotlinx-datetime"
+]
+biweekly = [
+    "biweekly"
+]
+
+[plugins]
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
