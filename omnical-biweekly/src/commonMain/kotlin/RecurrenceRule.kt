@@ -6,6 +6,7 @@ import biweekly.io.TimezoneAssignment
 import biweekly.io.TimezoneInfo
 import biweekly.io.WriteContext
 import biweekly.io.scribe.property.RecurrenceRuleScribe
+import biweekly.parameter.ICalParameters
 import biweekly.property.RecurrenceRule
 import biweekly.util.Recurrence
 import kotlinx.datetime.TimeZone
@@ -85,7 +86,7 @@ fun ICalendarRecurrenceRule.Companion.parse(
     }
     return runCatching {
         RecurrenceRuleScribe()
-            .parseText(value, null, null, parseContext)
+            .parseText(value, null, ICalParameters(), parseContext)
             ?.value
             ?.toOmnicalValue(errors) ?: return null
     }.getOrNull()
