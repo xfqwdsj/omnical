@@ -209,7 +209,7 @@ enum class ICalendarColor(val value: String, val r: UByte, val g: UByte, val b: 
          * @return A color from the de-duplicated [palette].
          */
         fun pickFromPalette(index: UInt) = palette[
-            (index % ICalendarColor.entries.size.toUInt()).toInt()
+            (index % palette.size.toUInt()).toInt()
         ]
     }
 
